@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Copy, Check, FileText, CreditCard, AlertTriangle, Bookmark } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import logoCcd from "@/assets/logo-ccd.jpeg";
 
 type TipoVenta = "COMPLETA" | "FRACCIONADA" | "DEUDA" | "SEPARACION DE VACANTE";
 
