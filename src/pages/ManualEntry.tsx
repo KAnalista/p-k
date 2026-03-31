@@ -41,13 +41,18 @@ const initialForm: FormData = {
   fecha2doPago: "",
   monto2doPago: "S/ 0.00",
 };
+function formatDateDisplay(dateStr: string): string {
+  if (!dateStr) return "";
+  const [year, month, day] = dateStr.split("-");
+  return `${parseInt(day)}/${parseInt(month)}/${year}`;
+}
 
 function formatMessage(data: FormData, tipo: TipoVenta): string {
   const lines: string[] = [];
 
   if (data.nombre) lines.push(`👤 *Nombre:* ${data.nombre}`);
   if (data.telefono) lines.push(`📱 *Teléfono:* ${data.telefono}`);
-  if (data.dni) lines.push(`🪪 *DNI:* ${data.dni}`);
+  if (data.dni) lines.push(`🪪 *DNI/CE:* ${data.dni}`);
   if (data.correo) lines.push(`📧 *Correo:* ${data.correo}`);
   if (data.curso) lines.push(`📚 *Curso:* ${data.curso}`);
   if (data.asesor) lines.push(`🧑‍💼 *Asesor:* *${data.asesor}*`);
@@ -55,18 +60,18 @@ function formatMessage(data: FormData, tipo: TipoVenta): string {
 
   if (tipo === "COMPLETA") {
     lines.push(`✅ *Estado Venta Completa:* PAGO`);
-    if (data.fechaVentaCompleta) lines.push(`📅 *Fecha Venta Completa:* ${data.fechaVentaCompleta}`);
+    if (data.fechaVentaCompleta) lines.push(`📅 *Fecha Venta Completa:* ${formatDateDisplay(data.fechaVentaCompleta)}`);
     if (data.montoVentaCompleta) lines.push(`💰 *Monto Venta Completa:* ${data.montoVentaCompleta}`);
   } else {
     lines.push("");
     lines.push("📌 *Este es el monto del primer pago:*");
     lines.push("");
     lines.push(`✅ *Estado 1er Pago:* PAGO`);
-    if (data.fecha1erPago) lines.push(`📅 *Fecha 1er Pago:* ${data.fecha1erPago}`);
+    if (data.fecha1erPago) lines.push(`📅 *Fecha 1er Pago:* ${formatDateDisplay(data.fecha1erPago)}`);
     if (data.monto1erPago) lines.push(`💰 *Monto 1er Pago:* ${data.monto1erPago}`);
     lines.push("");
     if (data.estado2doPago) lines.push(`✅ *Estado 2do Pago:* ${data.estado2doPago}`);
-    if (data.fecha2doPago) lines.push(`📅 *Fecha 2do Pago:* ${data.fecha2doPago}`);
+    if (data.fecha2doPago) lines.push(`📅 *Fecha 2do Pago:* ${formatDateDisplay(data.fecha2doPago)}`);
     if (data.monto2doPago) lines.push(`💰 *Monto 2do Pago:* ${data.monto2doPago}`);
     lines.push("");
     lines.push("⚠️ *No se olvide la siguiente fecha de pago.*");
@@ -81,14 +86,20 @@ interface FieldRowProps {
   value: string;
   onChange: (val: string) => void;
   placeholder?: string;
+  type?: string;
+  inputMode?: "text" | "numeric" | "decimal" | "email" | "tel";
+  pattern?: string;
 }
 
-function FieldRow({ label, emoji, value, onChange, placeholder }: FieldRowProps) {
+function FieldRow({ label, emoji, value, onChange, placeholder, type = "text", inputMode, pattern }: FieldRowProps) {
   return (
     <div className="flex items-center gap-2">
       <span className="text-lg shrink-0">{emoji}</span>
       <label className="text-sm font-medium text-foreground w-36 shrink-0">{label}</label>
       <Input
+        type={type}
+        inputMode={inputMode}
+        pattern={pattern}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder || label}
@@ -161,7 +172,7 @@ export default function ManualEntry() {
               <span className="text-sm font-semibold text-foreground">Datos del Cliente</span>
               <FieldRow emoji="👤" label="Nombre" value={form.nombre} onChange={(v) => update("nombre", v)} />
               <FieldRow emoji="📱" label="Teléfono" value={form.telefono} onChange={(v) => update("telefono", v)} />
-              <FieldRow emoji="🪪" label="DNI" value={form.dni} onChange={(v) => update("dni", v)} />
+              <FieldRow emoji="🪪" label="DNI/CE" value={form.dni} onChange={(v) => update("dni", v.replace(/\D/g, ""))} inputMode="numeric" pattern="[0-9]*" />
               <FieldRow emoji="📧" label="Correo" value={form.correo} onChange={(v) => update("correo", v)} />
               <FieldRow emoji="📚" label="Curso" value={form.curso} onChange={(v) => update("curso", v)} />
               <FieldRow emoji="🧑‍💼" label="Asesor" value={form.asesor} onChange={(v) => update("asesor", v)} />
@@ -175,8 +186,8 @@ export default function ManualEntry() {
                   <label className="text-sm font-medium text-foreground w-36 shrink-0">Estado</label>
                   <span className="text-sm font-semibold text-primary">PAGO</span>
                 </div>
-                <FieldRow emoji="📅" label="Fecha" value={form.fechaVentaCompleta} onChange={(v) => update("fechaVentaCompleta", v)} placeholder="31/3/2026" />
-                <FieldRow emoji="💰" label="Monto (S/)" value={form.montoVentaCompleta} onChange={(v) => update("montoVentaCompleta", v)} placeholder="S/ 430.00" />
+                <FieldRow emoji="📅" label="Fecha" value={form.fechaVentaCompleta} onChange={(v) => update("fechaVentaCompleta", v)} type="date" />
+                <FieldRow emoji="💰" label="Monto" value={form.montoVentaCompleta} onChange={(v) => update("montoVentaCompleta", v)} placeholder="S/ 430.00" />
               </Card>
             )}
 
@@ -189,8 +200,8 @@ export default function ManualEntry() {
                     <label className="text-sm font-medium text-foreground w-36 shrink-0">Estado 1er Pago</label>
                     <span className="text-sm font-semibold text-primary">PAGO</span>
                   </div>
-                  <FieldRow emoji="📅" label="Fecha 1er Pago" value={form.fecha1erPago} onChange={(v) => update("fecha1erPago", v)} placeholder="31/3/2026" />
-                  <FieldRow emoji="💰" label="Monto 1er Pago (S/)" value={form.monto1erPago} onChange={(v) => update("monto1erPago", v)} placeholder="S/ 200.00" />
+                  <FieldRow emoji="📅" label="Fecha 1er Pago" value={form.fecha1erPago} onChange={(v) => update("fecha1erPago", v)} type="date" />
+                  <FieldRow emoji="💰" label="Monto 1er Pago" value={form.monto1erPago} onChange={(v) => update("monto1erPago", v)} placeholder="S/ 200.00" />
                 </Card>
                 <Card className="p-4 space-y-3 border-primary/30">
                   <span className="text-sm font-semibold text-foreground">2do Pago</span>
@@ -206,8 +217,8 @@ export default function ManualEntry() {
                       <option value="PAGO">PAGO</option>
                     </select>
                   </div>
-                  <FieldRow emoji="📅" label="Fecha 2do Pago" value={form.fecha2doPago} onChange={(v) => update("fecha2doPago", v)} placeholder="30/4/2026" />
-                  <FieldRow emoji="💰" label="Monto 2do Pago (S/)" value={form.monto2doPago} onChange={(v) => update("monto2doPago", v)} placeholder="S/ 250.00" />
+                  <FieldRow emoji="📅" label="Fecha 2do Pago" value={form.fecha2doPago} onChange={(v) => update("fecha2doPago", v)} type="date" />
+                  <FieldRow emoji="💰" label="Monto 2do Pago" value={form.monto2doPago} onChange={(v) => update("monto2doPago", v)} placeholder="S/ 250.00" />
                 </Card>
               </>
             )}

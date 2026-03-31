@@ -137,7 +137,7 @@ export default function Index() {
           </div>
           <h1 className="text-2xl font-bold text-foreground">Formateador de Pagos</h1>
           <p className="text-muted-foreground text-sm">Pega la fila del Excel y obtén el mensaje formateado</p>
-          <Link to="/manual">
+          <Link to="/">
             <Button variant="outline" size="sm" className="gap-1.5 mt-2">
               <PenLine className="w-3.5 h-3.5" /> Ingreso Manual
             </Button>
