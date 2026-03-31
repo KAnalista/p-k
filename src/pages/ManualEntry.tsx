@@ -3,7 +3,7 @@ import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Copy, Check, FileText, CreditCard } from "lucide-react";
+import { Copy, Check, FileText, CreditCard, AlertTriangle, Bookmark } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type TipoVenta = "COMPLETA" | "FRACCIONADA";
