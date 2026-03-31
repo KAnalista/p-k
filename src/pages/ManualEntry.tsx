@@ -71,7 +71,7 @@ function formatMessage(data: FormData, tipo: TipoVenta, pagosExtra: PagoExtra[])
   if (data.asesor) lines.push(`🧑‍💼 *Asesor:* *${data.asesor}*`);
   lines.push(`📋 *Tipo Venta:* ${tipo}`);
 
-  if (tipo === "COMPLETA" || tipo === "DEUDA") {
+  if (tipo === "COMPLETA") {
     lines.push(`✅ *Estado Venta Completa:* PAGO`);
     if (data.fechaVentaCompleta) lines.push(`📅 *Fecha Venta Completa:* ${formatDateDisplay(data.fechaVentaCompleta)}`);
     if (data.montoVentaCompleta) lines.push(`💰 *Monto Venta Completa:* S/ ${data.montoVentaCompleta}`);
@@ -248,9 +248,9 @@ export default function ManualEntry() {
               <FieldRow emoji="🧑‍💼" label="Asesor" value={form.asesor} onChange={(v) => update("asesor", v)} />
             </Card>
 
-            {(tipo === "COMPLETA" || tipo === "DEUDA") && (
+            {tipo === "COMPLETA" && (
               <Card className="p-4 space-y-3 border-primary/30">
-                <span className="text-sm font-semibold text-foreground">{tipo === "COMPLETA" ? "Venta Completa" : "Deuda"}</span>
+                <span className="text-sm font-semibold text-foreground">Venta Completa</span>
                 <div className="flex items-center gap-2">
                   <span className="text-lg shrink-0">✅</span>
                   <label className="text-sm font-medium text-foreground w-36 shrink-0">Estado</label>
@@ -261,7 +261,7 @@ export default function ManualEntry() {
               </Card>
             )}
 
-            {(tipo === "FRACCIONADA" || tipo === "SEPARACION DE VACANTE") && (
+            {(tipo === "FRACCIONADA" || tipo === "SEPARACION DE VACANTE" || tipo === "DEUDA") && (
               <>
                 <Card className="p-4 space-y-3 border-primary/30">
                   <span className="text-sm font-semibold text-foreground">1er Pago</span>
