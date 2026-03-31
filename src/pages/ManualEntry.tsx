@@ -3,11 +3,17 @@ import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Copy, Check, FileText, CreditCard, AlertTriangle, Bookmark } from "lucide-react";
+import { Copy, Check, FileText, CreditCard, AlertTriangle, Bookmark, Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import logoCcd from "@/assets/logo-ccd.jpeg";
 
 type TipoVenta = "COMPLETA" | "FRACCIONADA" | "DEUDA" | "SEPARACION DE VACANTE";
+
+interface PagoExtra {
+  estado: string;
+  fecha: string;
+  monto: string;
+}
 
 interface FormData {
   nombre: string;
@@ -42,13 +48,16 @@ const initialForm: FormData = {
   fecha2doPago: "",
   monto2doPago: "",
 };
+
+const ordinalLabels = ["3er", "4to", "5to"];
+
 function formatDateDisplay(dateStr: string): string {
   if (!dateStr) return "";
   const [year, month, day] = dateStr.split("-");
   return `${parseInt(day)}/${parseInt(month)}/${year}`;
 }
 
-function formatMessage(data: FormData, tipo: TipoVenta): string {
+function formatMessage(data: FormData, tipo: TipoVenta, pagosExtra: PagoExtra[]): string {
   const lines: string[] = [];
 
   lines.push("📋 *DATOS DE VALIDACIÓN*");
@@ -77,6 +86,15 @@ function formatMessage(data: FormData, tipo: TipoVenta): string {
     if (data.estado2doPago) lines.push(`✅ *Estado 2do Pago:* ${data.estado2doPago}`);
     if (data.fecha2doPago) lines.push(`📅 *Fecha 2do Pago:* ${formatDateDisplay(data.fecha2doPago)}`);
     if (data.monto2doPago) lines.push(`💰 *Monto 2do Pago:* S/ ${data.monto2doPago}`);
+
+    pagosExtra.forEach((pago, i) => {
+      const label = ordinalLabels[i] || `${i + 3}°`;
+      lines.push("");
+      if (pago.estado) lines.push(`✅ *Estado ${label} Pago:* ${pago.estado}`);
+      if (pago.fecha) lines.push(`📅 *Fecha ${label} Pago:* ${formatDateDisplay(pago.fecha)}`);
+      if (pago.monto) lines.push(`💰 *Monto ${label} Pago:* S/ ${pago.monto}`);
+    });
+
     lines.push("");
     lines.push("⚠️ *No se olvide la siguiente fecha de pago.*");
   }
@@ -116,6 +134,7 @@ function FieldRow({ label, emoji, value, onChange, placeholder, type = "text", i
 export default function ManualEntry() {
   const [tipo, setTipo] = useState<TipoVenta>("COMPLETA");
   const [form, setForm] = useState<FormData>(initialForm);
+  const [pagosExtra, setPagosExtra] = useState<PagoExtra[]>([]);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
@@ -123,7 +142,21 @@ export default function ManualEntry() {
     setForm((prev) => ({ ...prev, [key]: val }));
   }, []);
 
-  const formatted = formatMessage(form, tipo);
+  const updatePagoExtra = useCallback((index: number, field: keyof PagoExtra, val: string) => {
+    setPagosExtra((prev) => prev.map((p, i) => i === index ? { ...p, [field]: val } : p));
+  }, []);
+
+  const addPagoExtra = useCallback(() => {
+    if (pagosExtra.length < 3) {
+      setPagosExtra((prev) => [...prev, { estado: "DEBE", fecha: "", monto: "" }]);
+    }
+  }, [pagosExtra.length]);
+
+  const removePagoExtra = useCallback((index: number) => {
+    setPagosExtra((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const formatted = formatMessage(form, tipo, pagosExtra);
   const hasContent = form.nombre || form.telefono || form.dni;
 
   const handleCopy = useCallback(async () => {
@@ -135,6 +168,7 @@ export default function ManualEntry() {
 
   const handleClear = useCallback(() => {
     setForm(initialForm);
+    setPagosExtra([]);
     setCopied(false);
   }, []);
 
@@ -256,6 +290,51 @@ export default function ManualEntry() {
                   <FieldRow emoji="📅" label="Fecha 2do Pago" value={form.fecha2doPago} onChange={(v) => update("fecha2doPago", v)} type="date" />
                   <FieldRow emoji="💰" label="Monto 2do Pago (S/)" value={form.monto2doPago} onChange={(v) => update("monto2doPago", v.replace(/[^\d.]/g, ""))} inputMode="decimal" placeholder="250.00" />
                 </Card>
+
+                {/* Pagos extra dinámicos */}
+                {pagosExtra.map((pago, i) => {
+                  const label = ordinalLabels[i] || `${i + 3}°`;
+                  return (
+                    <Card key={i} className="p-4 space-y-3 border-primary/30">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold text-foreground">{label} Pago</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removePagoExtra(i)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg shrink-0">✅</span>
+                        <label className="text-sm font-medium text-foreground w-36 shrink-0">Estado {label} Pago</label>
+                        <select
+                          value={pago.estado}
+                          onChange={(e) => updatePagoExtra(i, "estado", e.target.value)}
+                          className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          <option value="DEBE">DEBE</option>
+                          <option value="PAGO">PAGO</option>
+                        </select>
+                      </div>
+                      <FieldRow emoji="📅" label={`Fecha ${label} Pago`} value={pago.fecha} onChange={(v) => updatePagoExtra(i, "fecha", v)} type="date" />
+                      <FieldRow emoji="💰" label={`Monto ${label} Pago (S/)`} value={pago.monto} onChange={(v) => updatePagoExtra(i, "monto", v.replace(/[^\d.]/g, ""))} inputMode="decimal" placeholder="200.00" />
+                    </Card>
+                  );
+                })}
+
+                {pagosExtra.length < 3 && (
+                  <Button
+                    variant="outline"
+                    onClick={addPagoExtra}
+                    className="w-full gap-2 border-dashed border-primary/40 text-primary hover:bg-primary/5"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Agregar {ordinalLabels[pagosExtra.length] || `${pagosExtra.length + 3}°`} Pago
+                  </Button>
+                )}
               </>
             )}
 
