@@ -34,12 +34,12 @@ const initialForm: FormData = {
   asesor: "",
   estadoVentaCompleta: "PAGO",
   fechaVentaCompleta: "",
-  montoVentaCompleta: "S/ 0.00",
+  montoVentaCompleta: "",
   fecha1erPago: "",
-  monto1erPago: "S/ 0.00",
+  monto1erPago: "",
   estado2doPago: "DEBE",
   fecha2doPago: "",
-  monto2doPago: "S/ 0.00",
+  monto2doPago: "",
 };
 function formatDateDisplay(dateStr: string): string {
   if (!dateStr) return "";
