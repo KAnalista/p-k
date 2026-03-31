@@ -61,7 +61,7 @@ function formatMessage(data: FormData, tipo: TipoVenta): string {
   if (tipo === "COMPLETA") {
     lines.push(`✅ *Estado Venta Completa:* PAGO`);
     if (data.fechaVentaCompleta) lines.push(`📅 *Fecha Venta Completa:* ${formatDateDisplay(data.fechaVentaCompleta)}`);
-    if (data.montoVentaCompleta) lines.push(`💰 *Monto Venta Completa:* ${data.montoVentaCompleta}`);
+    if (data.montoVentaCompleta) lines.push(`💰 *Monto Venta Completa:* S/ ${data.montoVentaCompleta}`);
   } else {
     lines.push("");
     lines.push("📌 *Este es el monto del primer pago:*");
