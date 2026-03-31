@@ -71,7 +71,7 @@ function formatMessage(data: FormData, tipo: TipoVenta, pagosExtra: PagoExtra[])
   if (data.asesor) lines.push(`🧑‍💼 *Asesor:* *${data.asesor}*`);
   lines.push(`📋 *Tipo Venta:* ${tipo}`);
 
-  if (tipo === "COMPLETA" || tipo === "DEUDA") {
+  if (tipo === "COMPLETA") {
     lines.push(`✅ *Estado Venta Completa:* PAGO`);
     if (data.fechaVentaCompleta) lines.push(`📅 *Fecha Venta Completa:* ${formatDateDisplay(data.fechaVentaCompleta)}`);
     if (data.montoVentaCompleta) lines.push(`💰 *Monto Venta Completa:* S/ ${data.montoVentaCompleta}`);
