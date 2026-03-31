@@ -41,6 +41,11 @@ const initialForm: FormData = {
   fecha2doPago: "",
   monto2doPago: "S/ 0.00",
 };
+function formatDateDisplay(dateStr: string): string {
+  if (!dateStr) return "";
+  const [year, month, day] = dateStr.split("-");
+  return `${parseInt(day)}/${parseInt(month)}/${year}`;
+}
 
 function formatMessage(data: FormData, tipo: TipoVenta): string {
   const lines: string[] = [];
