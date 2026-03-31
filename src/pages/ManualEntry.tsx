@@ -86,14 +86,20 @@ interface FieldRowProps {
   value: string;
   onChange: (val: string) => void;
   placeholder?: string;
+  type?: string;
+  inputMode?: "text" | "numeric" | "decimal" | "email" | "tel";
+  pattern?: string;
 }
 
-function FieldRow({ label, emoji, value, onChange, placeholder }: FieldRowProps) {
+function FieldRow({ label, emoji, value, onChange, placeholder, type = "text", inputMode, pattern }: FieldRowProps) {
   return (
     <div className="flex items-center gap-2">
       <span className="text-lg shrink-0">{emoji}</span>
       <label className="text-sm font-medium text-foreground w-36 shrink-0">{label}</label>
       <Input
+        type={type}
+        inputMode={inputMode}
+        pattern={pattern}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder || label}
