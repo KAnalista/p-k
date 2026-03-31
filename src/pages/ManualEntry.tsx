@@ -3,10 +3,10 @@ import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Copy, Check, FileText, CreditCard } from "lucide-react";
+import { Copy, Check, FileText, CreditCard, AlertTriangle, Bookmark } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-type TipoVenta = "COMPLETA" | "FRACCIONADA";
+type TipoVenta = "COMPLETA" | "FRACCIONADA" | "DEUDA" | "SEPARACION DE VACANTE";
 
 interface FormData {
   nombre: string;
@@ -50,6 +50,9 @@ function formatDateDisplay(dateStr: string): string {
 function formatMessage(data: FormData, tipo: TipoVenta): string {
   const lines: string[] = [];
 
+  lines.push("📋 *DATOS DE VALIDACIÓN*");
+  lines.push("");
+
   if (data.nombre) lines.push(`👤 *Nombre:* ${data.nombre}`);
   if (data.telefono) lines.push(`📱 *Teléfono:* ${data.telefono}`);
   if (data.dni) lines.push(`🪪 *DNI/CE:* ${data.dni}`);
@@ -58,7 +61,7 @@ function formatMessage(data: FormData, tipo: TipoVenta): string {
   if (data.asesor) lines.push(`🧑‍💼 *Asesor:* *${data.asesor}*`);
   lines.push(`📋 *Tipo Venta:* ${tipo}`);
 
-  if (tipo === "COMPLETA") {
+  if (tipo === "COMPLETA" || tipo === "DEUDA") {
     lines.push(`✅ *Estado Venta Completa:* PAGO`);
     if (data.fechaVentaCompleta) lines.push(`📅 *Fecha Venta Completa:* ${formatDateDisplay(data.fechaVentaCompleta)}`);
     if (data.montoVentaCompleta) lines.push(`💰 *Monto Venta Completa:* S/ ${data.montoVentaCompleta}`);
@@ -138,11 +141,11 @@ export default function ManualEntry() {
     <div className="min-h-screen bg-background flex flex-col items-center px-4 py-8">
       <div className="w-full max-w-5xl">
         {/* Tipo de venta buttons */}
-        <div className="flex gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-6">
           <Button
             onClick={() => setTipo("COMPLETA")}
             variant={tipo === "COMPLETA" ? "default" : "outline"}
-            className={`flex-1 gap-2 h-14 text-base font-semibold transition-all ${
+            className={`gap-2 h-14 text-base font-semibold transition-all ${
               tipo === "COMPLETA"
                 ? "bg-primary text-primary-foreground shadow-lg scale-[1.02]"
                 : "hover:bg-accent"
@@ -152,9 +155,21 @@ export default function ManualEntry() {
             COMPLETA
           </Button>
           <Button
+            onClick={() => setTipo("DEUDA")}
+            variant={tipo === "DEUDA" ? "default" : "outline"}
+            className={`gap-2 h-14 text-base font-semibold transition-all ${
+              tipo === "DEUDA"
+                ? "bg-primary text-primary-foreground shadow-lg scale-[1.02]"
+                : "hover:bg-accent"
+            }`}
+          >
+            <AlertTriangle className="w-5 h-5" />
+            DEUDA
+          </Button>
+          <Button
             onClick={() => setTipo("FRACCIONADA")}
             variant={tipo === "FRACCIONADA" ? "default" : "outline"}
-            className={`flex-1 gap-2 h-14 text-base font-semibold transition-all ${
+            className={`gap-2 h-14 text-base font-semibold transition-all ${
               tipo === "FRACCIONADA"
                 ? "bg-primary text-primary-foreground shadow-lg scale-[1.02]"
                 : "hover:bg-accent"
@@ -162,6 +177,18 @@ export default function ManualEntry() {
           >
             <CreditCard className="w-5 h-5" />
             FRACCIONADA
+          </Button>
+          <Button
+            onClick={() => setTipo("SEPARACION DE VACANTE")}
+            variant={tipo === "SEPARACION DE VACANTE" ? "default" : "outline"}
+            className={`gap-2 h-14 text-sm font-semibold transition-all ${
+              tipo === "SEPARACION DE VACANTE"
+                ? "bg-primary text-primary-foreground shadow-lg scale-[1.02]"
+                : "hover:bg-accent"
+            }`}
+          >
+            <Bookmark className="w-5 h-5" />
+            SEPARACIÓN DE VACANTE
           </Button>
         </div>
 
@@ -178,9 +205,9 @@ export default function ManualEntry() {
               <FieldRow emoji="🧑‍💼" label="Asesor" value={form.asesor} onChange={(v) => update("asesor", v)} />
             </Card>
 
-            {tipo === "COMPLETA" && (
+            {(tipo === "COMPLETA" || tipo === "DEUDA") && (
               <Card className="p-4 space-y-3 border-primary/30">
-                <span className="text-sm font-semibold text-foreground">Venta Completa</span>
+                <span className="text-sm font-semibold text-foreground">{tipo === "COMPLETA" ? "Venta Completa" : "Deuda"}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-lg shrink-0">✅</span>
                   <label className="text-sm font-medium text-foreground w-36 shrink-0">Estado</label>
@@ -191,7 +218,7 @@ export default function ManualEntry() {
               </Card>
             )}
 
-            {tipo === "FRACCIONADA" && (
+            {(tipo === "FRACCIONADA" || tipo === "SEPARACION DE VACANTE") && (
               <>
                 <Card className="p-4 space-y-3 border-primary/30">
                   <span className="text-sm font-semibold text-foreground">1er Pago</span>
