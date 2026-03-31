@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Copy, Check, FileText, CreditCard, AlertTriangle, Bookmark } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-type TipoVenta = "COMPLETA" | "FRACCIONADA";
+type TipoVenta = "COMPLETA" | "FRACCIONADA" | "DEUDA" | "SEPARACION DE VACANTE";
 
 interface FormData {
   nombre: string;
