@@ -172,7 +172,7 @@ export default function ManualEntry() {
               <span className="text-sm font-semibold text-foreground">Datos del Cliente</span>
               <FieldRow emoji="👤" label="Nombre" value={form.nombre} onChange={(v) => update("nombre", v)} />
               <FieldRow emoji="📱" label="Teléfono" value={form.telefono} onChange={(v) => update("telefono", v)} />
-              <FieldRow emoji="🪪" label="DNI" value={form.dni} onChange={(v) => update("dni", v)} />
+              <FieldRow emoji="🪪" label="DNI/CE" value={form.dni} onChange={(v) => update("dni", v.replace(/\D/g, ""))} inputMode="numeric" pattern="[0-9]*" />
               <FieldRow emoji="📧" label="Correo" value={form.correo} onChange={(v) => update("correo", v)} />
               <FieldRow emoji="📚" label="Curso" value={form.curso} onChange={(v) => update("curso", v)} />
               <FieldRow emoji="🧑‍💼" label="Asesor" value={form.asesor} onChange={(v) => update("asesor", v)} />
