@@ -47,7 +47,7 @@ function formatMessage(data: FormData, tipo: TipoVenta): string {
 
   if (data.nombre) lines.push(`👤 *Nombre:* ${data.nombre}`);
   if (data.telefono) lines.push(`📱 *Teléfono:* ${data.telefono}`);
-  if (data.dni) lines.push(`🪪 *DNI:* ${data.dni}`);
+  if (data.dni) lines.push(`🪪 *DNI/CE:* ${data.dni}`);
   if (data.correo) lines.push(`📧 *Correo:* ${data.correo}`);
   if (data.curso) lines.push(`📚 *Curso:* ${data.curso}`);
   if (data.asesor) lines.push(`🧑‍💼 *Asesor:* *${data.asesor}*`);
@@ -55,18 +55,18 @@ function formatMessage(data: FormData, tipo: TipoVenta): string {
 
   if (tipo === "COMPLETA") {
     lines.push(`✅ *Estado Venta Completa:* PAGO`);
-    if (data.fechaVentaCompleta) lines.push(`📅 *Fecha Venta Completa:* ${data.fechaVentaCompleta}`);
+    if (data.fechaVentaCompleta) lines.push(`📅 *Fecha Venta Completa:* ${formatDateDisplay(data.fechaVentaCompleta)}`);
     if (data.montoVentaCompleta) lines.push(`💰 *Monto Venta Completa:* ${data.montoVentaCompleta}`);
   } else {
     lines.push("");
     lines.push("📌 *Este es el monto del primer pago:*");
     lines.push("");
     lines.push(`✅ *Estado 1er Pago:* PAGO`);
-    if (data.fecha1erPago) lines.push(`📅 *Fecha 1er Pago:* ${data.fecha1erPago}`);
+    if (data.fecha1erPago) lines.push(`📅 *Fecha 1er Pago:* ${formatDateDisplay(data.fecha1erPago)}`);
     if (data.monto1erPago) lines.push(`💰 *Monto 1er Pago:* ${data.monto1erPago}`);
     lines.push("");
     if (data.estado2doPago) lines.push(`✅ *Estado 2do Pago:* ${data.estado2doPago}`);
-    if (data.fecha2doPago) lines.push(`📅 *Fecha 2do Pago:* ${data.fecha2doPago}`);
+    if (data.fecha2doPago) lines.push(`📅 *Fecha 2do Pago:* ${formatDateDisplay(data.fecha2doPago)}`);
     if (data.monto2doPago) lines.push(`💰 *Monto 2do Pago:* ${data.monto2doPago}`);
     lines.push("");
     lines.push("⚠️ *No se olvide la siguiente fecha de pago.*");
